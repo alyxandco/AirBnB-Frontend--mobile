@@ -102,9 +102,9 @@ export default function SignInScreen({ setToken }) {
                 <Text style={text_button}>Sign in</Text>
               </TouchableOpacity>
               <TouchableOpacity
-              // onPress={() => {
-              //   navigation.navigate("SignUp");
-              // }}
+                onPress={() => {
+                  navigation.navigate("SignUp");
+                }}
               >
                 <Text style={text_bottom}>No account ? Register</Text>
               </TouchableOpacity>

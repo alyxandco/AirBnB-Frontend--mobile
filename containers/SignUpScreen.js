@@ -1,10 +1,11 @@
 import Constants from "expo-constants";
+import { useNavigation } from "@react-navigation/core";
 import { useState } from "react";
 import airbnblogo from "../assets/airbnblogo.png";
+import axios from "axios";
 import {
   ScrollView,
   SafeAreaView,
-  Button,
   TouchableOpacity,
   Text,
   TextInput,
@@ -15,20 +16,72 @@ import {
 } from "react-native";
 
 export default function SignUpScreen({ setToken }) {
-  console.log(Platform.OS);
+  const navigation = useNavigation();
+
+  // console.log(Platform.OS);
+
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
-  const [description, setDescription] = useState("");
-  const [password, setPassword] = useState("");
+  const [description, setDescription] = useState("Lorem Ipsum");
+  const [password, setPassword] = useState("azerty");
+  const [confirmPassword, setconfirmPassword] = useState("azerty");
 
-  console.log("email : ", email);
-  console.log("username : ", username);
-  console.log("description : ", description);
-  console.log("password : ", password);
+  const [error, setError] = useState("");
+
+  // console.log("email : ", email);
+  // console.log("username : ", username);
+  // console.log("description : ", description);
+  // console.log("password : ", password);
+  // console.log("confirmPassword : ", confirmPassword);
+
+  const submit = async () => {
+    try {
+      setError("");
+      if (
+        !email ||
+        !username ||
+        !password ||
+        !confirmPassword ||
+        !description
+      ) {
+        alert("Merci de remplir tous les champs");
+        return;
+      }
+      if (password !== confirmPassword) {
+        alert("Merc de saisir un MDP identique");
+        return;
+      }
+
+      const response = await axios.post(
+        "https://lereacteur-bootcamp-api.herokuapp.com/api/airbnb/user/sign_up",
+        {
+          email: email,
+          username: username,
+          description: description,
+          password: password,
+        }
+      );
+
+      if (response.data) {
+        // console.log("response : ", response.data);
+        setToken(response.data.token);
+        alert(`Bienvenue ${response.data.username}`);
+      }
+    } catch (error) {
+      const message = error.response.data.error;
+      const statusCode = error.response.status;
+
+      console.log(error.response.data);
+
+      if (statusCode === 400) {
+        alert(message);
+      }
+    }
+  };
+
   const {
     viewDimension,
     scrollView,
-    signin_container,
     logo,
     logo_container,
     text_logo,
@@ -100,39 +153,24 @@ export default function SignUpScreen({ setToken }) {
                 autoCapitalize="none"
                 secureTextEntry={true}
                 style={input}
-                onChangeText={(text) => {}}
+                value={confirmPassword}
+                onChangeText={(input) => {
+                  setconfirmPassword(input);
+                }}
               />
             </View>
             <View>
               <TouchableOpacity
                 style={button}
-                onPress={async () => {
-                  try {
-                    console.log(data);
-                    const response = await axios.post(
-                      "https://lereacteur-bootcamp-api.herokuapp.com/api/airbnb/user/sign_up",
-                      {
-                        email: email,
-                        username: username,
-                        description: description,
-                        password: password,
-                      }
-                    );
-                    console.log("response.data : ", response.data);
-                    if (response.data.token) {
-                      const userToken = "secret-token";
-                      setToken(userToken);
-                    }
-                  } catch (error) {
-                    console.log("error.response : ", error.response);
-                  }
+                onPress={() => {
+                  submit();
                 }}
               >
                 <Text style={text_button}>Sign up</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("SignUp");
+                  navigation.navigate("Sign In");
                 }}
               >
                 <Text style={text_bottom}>
@@ -160,14 +198,10 @@ const styles = StyleSheet.create({
   scrollView: {
     paddingTop: Constants.statusBarHeight,
     marginTop: Platform.OS === "android" ? Constants.statusBarHeight : 0,
+    backgroundColor: "white",
   },
 
   main_container: {
-    // paddingLeft: 20,
-    alignItems: "center",
-  },
-
-  signin_container: {
     alignItems: "center",
   },
 
@@ -177,13 +211,12 @@ const styles = StyleSheet.create({
 
   logo_container: {
     marginVertical: 40,
-    // backgroundColor: "red",
     alignItems: "center",
   },
 
   input_container: {
     width: 250,
-    marginBottom: 80,
+    marginBottom: 50,
     paddingBottom: 30,
   },
   input: {
@@ -199,7 +232,6 @@ const styles = StyleSheet.create({
   },
 
   input_textarea: {
-    // height: 40,
     paddingBottom: 10,
     marginBottom: 20,
     borderColor: "red",
@@ -214,10 +246,10 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     borderWidth: 2,
     borderRadius: 25,
-    marginVertical: 20,
+    marginVertical: 10,
   },
   text_button: {
-    lineHeight: 25,
+    lineHeight: 40,
     justifyContent: "center",
     textAlign: "center",
     fontSize: 15,

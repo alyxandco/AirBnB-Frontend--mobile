@@ -16,17 +16,49 @@ import {
 } from "react-native";
 
 export default function SignInScreen({ setToken }) {
-  console.log(Platform.OS);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  console.log("email : ", email);
-  console.log("password : ", password);
+  // console.log(Platform.OS);
+  const [email, setEmail] = useState("ab21@test.com");
+  const [password, setPassword] = useState("azerty");
+
+  // console.log("email : ", email);
+  // console.log("password : ", password);
+
+  const submit = async () => {
+    try {
+      if (!email || !password) {
+        alert("Merci de remplir tous les champs");
+        return;
+      }
+
+      const response = await axios.post(
+        "https://lereacteur-bootcamp-api.herokuapp.com/api/airbnb/user/log_in",
+        {
+          email: email,
+          password: password,
+        }
+      );
+      // console.log(response.data);
+      if (response.data) {
+        setToken(response.data.token);
+        alert(`Bienvenue ${response.data.username}`);
+      }
+    } catch (error) {
+      const message = error.response.data.error;
+      const statusCode = error.response.status;
+
+      console.log(error.response.data.error);
+      console.log(error.response.status);
+
+      if (statusCode === 400 || statusCode === 401) {
+        alert(message);
+      }
+    }
+  };
 
   const navigation = useNavigation();
   const {
     viewDimension,
     scrollView,
-    signin_container,
     logo,
     logo_container,
     text_logo,
@@ -52,6 +84,7 @@ export default function SignInScreen({ setToken }) {
                 autoCapitalize="none"
                 placeholder="email"
                 style={input}
+                value={email}
                 onChangeText={(input) => {
                   setEmail(input);
                 }}
@@ -61,6 +94,7 @@ export default function SignInScreen({ setToken }) {
                 placeholder="password"
                 secureTextEntry={true}
                 style={input}
+                value={password}
                 onChangeText={(input) => {
                   setPassword(input);
                 }}
@@ -70,40 +104,14 @@ export default function SignInScreen({ setToken }) {
               <TouchableOpacity
                 style={button}
                 onPress={async () => {
-                  try {
-                    const response = await axios.post(
-                      "https://lereacteur-bootcamp-api.herokuapp.com/api/airbnb/user/log_in",
-                      {
-                        email: email,
-                        password: password,
-                      }
-                    );
-                    console.log(response.data);
-                    if (response.data.token) {
-                      setToken(response.data.token);
-                      alert(`Bienvenue ${response.data.username}`);
-                    }
-                  } catch (error) {
-                    console.log("error.response : ", error.response.data.error);
-                    if (error.response.data.error === "undefined") {
-                      alert(`Utilisateur et/ou mot de passe inconnu`);
-                    }
-                    if (error.response.data.error === "Unauthorized") {
-                      alert(`Utilisateur et/ou mot de passe incorrect`);
-                    }
-                    if (error.response.status === "401") {
-                      alert(`Utilisateur et/ou mot de passe incorrect`);
-                    }
-                  }
-                  // const userToken = "secret-token";
-                  // setToken(userToken);
+                  submit();
                 }}
               >
                 <Text style={text_button}>Sign in</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate("SignUp");
+                  navigation.navigate("Sign Up");
                 }}
               >
                 <Text style={text_bottom}>No account ? Register</Text>
@@ -122,7 +130,6 @@ export default function SignInScreen({ setToken }) {
 
 const styles = StyleSheet.create({
   viewDimension: {
-    // height: 200,
     width: "100%",
   },
 
@@ -132,7 +139,6 @@ const styles = StyleSheet.create({
   },
 
   main_container: {
-    // paddingLeft: 20,
     alignItems: "center",
   },
 
@@ -146,7 +152,6 @@ const styles = StyleSheet.create({
 
   logo_container: {
     marginVertical: 40,
-    // backgroundColor: "red",
     alignItems: "center",
   },
 
@@ -169,19 +174,18 @@ const styles = StyleSheet.create({
 
   button: {
     height: 50,
-    paddingBottom: 10,
     borderColor: "red",
     borderStyle: "solid",
     borderWidth: 2,
     borderRadius: 25,
-    marginVertical: 20,
   },
+
   text_button: {
-    lineHeight: 25,
-    justifyContent: "center",
+    lineHeight: 40,
     textAlign: "center",
     fontSize: 15,
   },
+
   text_bottom: {
     lineHeight: 50,
     textAlign: "center",

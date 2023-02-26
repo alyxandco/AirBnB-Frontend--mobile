@@ -5,6 +5,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import { Platform } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Octicons } from "@expo/vector-icons";
 
 // containers
 import HomeScreen from "./containers/HomeScreen";
@@ -13,6 +15,8 @@ import SignInScreen from "./containers/SignInScreen";
 import SignUpScreen from "./containers/SignUpScreen";
 import SettingsScreen from "./containers/SettingsScreen";
 import SplashScreen from "./containers/SplashScreen";
+import RoomScreen from "./containers/RoomScreen";
+import AroundmeScreen from "./containers/AroundmeScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -58,11 +62,11 @@ export default function App() {
         {userToken === null ? (
           // No token found, user isn't signed in
           <>
-            <Stack.Screen name="SignIn">
-              {() => <SignInScreen setToken={setToken} />}
+            <Stack.Screen name="Sign In">
+              {(props) => <SignInScreen {...props} setToken={setToken} />}
             </Stack.Screen>
-            <Stack.Screen name="SignUp">
-              {() => <SignUpScreen setToken={setToken} />}
+            <Stack.Screen name="Sign Up">
+              {(props) => <SignUpScreen {...props} setToken={setToken} />}
             </Stack.Screen>
           </>
         ) : (
@@ -73,9 +77,11 @@ export default function App() {
                 screenOptions={{
                   headerShown: false,
                   tabBarActiveTintColor: "tomato",
-                  tabBarInactiveTintColor: "gray",
+                  tabBarInactiveTintColor: "grey",
                 }}
               >
+                {/* tab HOME */}
+
                 <Tab.Screen
                   name="TabHome"
                   options={{
@@ -90,12 +96,21 @@ export default function App() {
                       <Stack.Screen
                         name="Home"
                         options={{
-                          title: "My App",
-                          headerStyle: { backgroundColor: "red" },
-                          headerTitleStyle: { color: "white" },
+                          title: "Home",
+                          headerStyle: { backgroundColor: "white" },
+                          headerTitleStyle: { color: "black" },
                         }}
                       >
-                        {() => <HomeScreen />}
+                        {(props) => <HomeScreen {...props} />}
+                      </Stack.Screen>
+
+                      <Stack.Screen
+                        name="RoomScreen"
+                        options={{
+                          title: "Rooms",
+                        }}
+                      >
+                        {(props) => <RoomScreen {...props} />}
                       </Stack.Screen>
 
                       <Stack.Screen
@@ -109,13 +124,16 @@ export default function App() {
                     </Stack.Navigator>
                   )}
                 </Tab.Screen>
+
+                {/* Tab MAP */}
+
                 <Tab.Screen
-                  name="TabSettings"
+                  name="AroundmeScreen Tab"
                   options={{
-                    tabBarLabel: "Settings",
+                    tabBarLabel: "Around me",
                     tabBarIcon: ({ color, size }) => (
-                      <Ionicons
-                        name={"ios-options"}
+                      <MaterialCommunityIcons
+                        name={"map-marker-outline"}
                         size={size}
                         color={color}
                       />
@@ -125,9 +143,45 @@ export default function App() {
                   {() => (
                     <Stack.Navigator>
                       <Stack.Screen
+                        name="AroundmeScreen"
+                        options={{
+                          title: "Around me",
+                        }}
+                      >
+                        {() => <AroundmeScreen setToken={setToken} />}
+                      </Stack.Screen>
+
+                      <Stack.Screen
+                        name="Room"
+                        options={{
+                          title: `Room`,
+                        }}
+                      >
+                        {(props) => (
+                          <RoomScreen {...props} setToken={setToken} />
+                        )}
+                      </Stack.Screen>
+                    </Stack.Navigator>
+                  )}
+                </Tab.Screen>
+
+                {/* Tab MyProfile  */}
+
+                <Tab.Screen
+                  name="TabSettings"
+                  options={{
+                    tabBarLabel: "My profile",
+                    tabBarIcon: ({ color, size }) => (
+                      <Octicons name={"person"} size={size} color={color} />
+                    ),
+                  }}
+                >
+                  {() => (
+                    <Stack.Navigator>
+                      <Stack.Screen
                         name="Settings"
                         options={{
-                          title: "Settings",
+                          title: "User Settings",
                         }}
                       >
                         {() => <SettingsScreen setToken={setToken} />}

@@ -6,6 +6,7 @@ import airbnblogo from "../assets/airbnblogo.png";
 import { Entypo } from "@expo/vector-icons";
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import Swiper from "react-native-swiper";
+import ReadMore from "@fawazahmed/react-native-read-more";
 
 import {
   SafeAreaView,
@@ -53,6 +54,8 @@ export default function RoomScreen(setToken) {
   }, []);
 
   const {
+    desc_see_less_text,
+    desc_see_more_text,
     animationContainer,
     desc_text,
     slide1,
@@ -145,7 +148,15 @@ export default function RoomScreen(setToken) {
                   <Text>{generateStars(data.ratingValue)}</Text>
                   <Text style={review_text}>{data.reviews} reviews</Text>
                 </View>
-                <Text style={desc_text}>{data.description} reviews</Text>
+                {/* <Text style={desc_text}>{data.description}</Text> */}
+                <ReadMore
+                  numberOfLines={3}
+                  style={desc_text}
+                  seeMoreStyle={desc_see_more_text}
+                  seeLessStyle={desc_see_less_text}
+                >
+                  {data.description}
+                </ReadMore>
               </View>
             </View>
           </View>
@@ -261,6 +272,17 @@ const styles = StyleSheet.create({
 
   desc_text: {
     marginVertical: 15,
+    fontSize: 16,
+  },
+
+  desc_see_more_text: {
+    color: "red",
+    fontSize: 16,
+  },
+
+  desc_see_less_text: {
+    color: "red",
+    fontSize: 15,
   },
 
   map: {

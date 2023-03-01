@@ -2,8 +2,12 @@ import { useNavigation } from "@react-navigation/core";
 import Constants from "expo-constants";
 import axios from "axios";
 import { useState } from "react";
+import { PasswordVisible } from "../components/PasswordVisible";
+
+import { Ionicons } from "@expo/vector-icons";
 import airbnblogo from "../assets/airbnblogo.png";
 import {
+  Pressable,
   ScrollView,
   SafeAreaView,
   Text,
@@ -15,8 +19,12 @@ import {
   Image,
 } from "react-native";
 
-export default function SignInScreen({ setToken }) {
+export default function SignInScreen({ setToken, setId }) {
+  const { passwordVisibility, eyeIcon, handlePasswordVisibility } =
+    PasswordVisible();
+
   // console.log(Platform.OS);
+
   const [email, setEmail] = useState("ab21@test.com");
   const [password, setPassword] = useState("azerty");
 
@@ -40,6 +48,7 @@ export default function SignInScreen({ setToken }) {
       // console.log(response.data);
       if (response.data) {
         setToken(response.data.token);
+        setId(response.data.id);
         alert(`Bienvenue ${response.data.username}`);
       }
     } catch (error) {
@@ -57,6 +66,8 @@ export default function SignInScreen({ setToken }) {
 
   const navigation = useNavigation();
   const {
+    pwd_input_container,
+    pwd_container,
     viewDimension,
     scrollView,
     logo,
@@ -89,16 +100,24 @@ export default function SignInScreen({ setToken }) {
                   setEmail(input);
                 }}
               />
-              <TextInput
-                autoCapitalize="none"
-                placeholder="password"
-                secureTextEntry={true}
-                style={input}
-                value={password}
-                onChangeText={(input) => {
-                  setPassword(input);
-                }}
-              />
+
+              <View style={pwd_container}>
+                <View style={pwd_input_container}>
+                  <TextInput
+                    autoCapitalize="none"
+                    placeholder="password"
+                    secureTextEntry={passwordVisibility}
+                    style={input}
+                    value={password}
+                    onChangeText={(input) => {
+                      setPassword(input);
+                    }}
+                  />
+                  <Pressable onPress={handlePasswordVisibility}>
+                    <Ionicons name={eyeIcon} size={22} color="black" />
+                  </Pressable>
+                </View>
+              </View>
             </View>
             <View>
               <TouchableOpacity
@@ -161,6 +180,7 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
   input: {
+    width: "90%",
     height: 40,
     paddingBottom: 10,
     marginBottom: 20,
@@ -170,6 +190,16 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
     borderLeftWidth: 0,
     borderRightWidth: 0,
+  },
+
+  pwd_container: {
+    Flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  pwd_input_container: {
+    flexDirection: "row",
   },
 
   button: {

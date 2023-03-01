@@ -4,7 +4,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import { Platform } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Octicons } from "@expo/vector-icons";
 
@@ -34,6 +33,20 @@ export default function App() {
 
     setUserToken(token);
   };
+  // console.log("userToken : ", userToken);
+
+  const [userId, setUserId] = useState(null);
+
+  const setId = async (id) => {
+    if (id) {
+      await AsyncStorage.setItem("userId", id);
+    } else {
+      await AsyncStorage.removeItem("userId");
+    }
+
+    setUserId(id);
+  };
+  // console.log("userId : ", userId);
 
   useEffect(() => {
     // Fetch the token from storage then navigate to our appropriate place
@@ -43,7 +56,10 @@ export default function App() {
 
       // This will switch to the App screen or Auth screen and this loading
       // screen will be unmounted and thrown away.
-      setUserToken(userToken);
+      // setUserToken(userToken);
+
+      const userId = await AsyncStorage.getItem("userId");
+      setUserId(userId);
 
       setIsLoading(false);
     };
@@ -63,10 +79,14 @@ export default function App() {
           // No token found, user isn't signed in
           <>
             <Stack.Screen name="Sign In">
-              {(props) => <SignInScreen {...props} setToken={setToken} />}
+              {(props) => (
+                <SignInScreen {...props} setToken={setToken} setId={setId} />
+              )}
             </Stack.Screen>
             <Stack.Screen name="Sign Up">
-              {(props) => <SignUpScreen {...props} setToken={setToken} />}
+              {(props) => (
+                <SignUpScreen {...props} setToken={setToken} setId={setId} />
+              )}
             </Stack.Screen>
           </>
         ) : (
@@ -179,12 +199,18 @@ export default function App() {
                   {() => (
                     <Stack.Navigator>
                       <Stack.Screen
-                        name="Settings"
+                        name="Profile"
                         options={{
-                          title: "User Settings",
+                          title: "My Profile",
                         }}
                       >
-                        {() => <SettingsScreen setToken={setToken} />}
+                        {(props) => (
+                          <ProfileScreen
+                            {...props}
+                            setToken={setToken}
+                            setId={setId}
+                          />
+                        )}
                       </Stack.Screen>
                     </Stack.Navigator>
                   )}
